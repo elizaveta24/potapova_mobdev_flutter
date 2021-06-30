@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:fluttermobilepotapova/main.dart';
+import 'package:crypto/crypto.dart';
 
 class JWT extends StatefulWidget {
   State<StatefulWidget> createState() => _JWTState();
@@ -10,6 +11,8 @@ class JWT extends StatefulWidget {
 
 class _JWTState extends State<JWT> {
   final HttpClient client = HttpClient();
+  TextEditingController usernameTextFieldController = TextEditingController();
+  TextEditingController passwordTextFieldController = TextEditingController();
 
   String token = '';
   String responseText = '';
@@ -41,22 +44,39 @@ class _JWTState extends State<JWT> {
   void getToken() {
     MyApp.analytics.logEvent(
         name: 'ButtonClick', parameters: {'ButtonName': 'GetTokenButton'});
+
+    var username = usernameTextFieldController.text;
+    var password = passwordTextFieldController.text;
+    var hashedPassword = sha256.convert(utf8.encode(password)).toString();
+
     client
-        .getUrl(Uri.parse('https://51.15.91.29/potapova/jwt/auth'))
+        .getUrl(Uri.parse(
+            'https://51.15.91.29/potapova/jwt/auth?username=$username&hashed_password=$hashedPassword'))
         .then((HttpClientRequest request) {
-      //принимает функцию обратного вызова, которая будет срабатывать при завершении Future.
       // Optionally set up headers...
       // Optionally write to the request object...
       // Then call close.
+      print(request);
       return request.close();
     }).then((HttpClientResponse response) {
       // Process the response.
-      response.listen((event) {
-        String responseString = String.fromCharCodes(event);
-        setState(() {
-          token = json.decode(responseString)['token'];
+      if (response.statusCode == 200) {
+        response.listen((event) {
+          String responseString = String.fromCharCodes(event);
+          setState(() {
+            token = json.decode(responseString)['token'];
+            print(token);
+          });
         });
-      });
+      } else {
+        response.listen((event) {
+          setState(() {
+            responseText = String.fromCharCodes(event);
+            responseImage = null;
+            token = '';
+          });
+        });
+      }
     });
   }
 
@@ -73,7 +93,8 @@ class _JWTState extends State<JWT> {
       // Process the response.
       if (response.statusCode != 200) {
         response.listen((event) {
-          String responseString = String.fromCharCodes(event);//возвращает строку, созданную из указанной последовательности значений единиц кода UTF-16
+          String responseString = String.fromCharCodes(
+              event); //возвращает строку, созданную из указанной последовательности значений единиц кода UTF-16
           setState(() {
             responseText = responseString;
           });
@@ -91,8 +112,7 @@ class _JWTState extends State<JWT> {
           setState(() {
             responseText = '"message": "$message"\n"time":"$time"\n"photo":';
             try {
-              responseImage = base64
-                  .decode(jsonDecoded['image']); 
+              responseImage = base64.decode(jsonDecoded['image']);
               print(responseImage);
             } catch (e) {
               print(e);
@@ -106,12 +126,23 @@ class _JWTState extends State<JWT> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        child: Column(
+        child: SingleChildScrollView(
+            child: Column(
       children: [
         Container(
             alignment: Alignment.center,
             margin: EdgeInsets.all(12),
             child: Text('Токен: $token', textAlign: TextAlign.center)),
+        TextField(
+            controller: usernameTextFieldController,
+            decoration: InputDecoration(
+              hintText: "Username",
+            )),
+        TextField(
+            controller: passwordTextFieldController,
+            decoration: InputDecoration(
+              hintText: "Password",
+            )),
         ElevatedButton(onPressed: getToken, child: Text('Получить токен')),
         ElevatedButton(onPressed: getProtected, child: Text('Получить фото')),
         Container(
@@ -125,6 +156,6 @@ class _JWTState extends State<JWT> {
           ],
         )),
       ],
-    ));
+    )));
   }
 }

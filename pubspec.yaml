@@ -62,6 +62,9 @@ dependencies:
   firebase_core: 
   firebase_analytics:
   infinite_listview: 
+  crypto:
+  
+
 
   
 
