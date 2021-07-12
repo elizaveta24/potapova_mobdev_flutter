@@ -63,6 +63,8 @@ dependencies:
   firebase_analytics:
   infinite_listview: 
   crypto:
+  aes_crypt:
+  cryptography:
   
 
 

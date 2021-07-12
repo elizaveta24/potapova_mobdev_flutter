@@ -157,7 +157,9 @@ class _CelciumState extends State<Celcium> {
   _loadData2() async {
     var response = await http.get(Uri.parse("https://yandex.ru/pogoda/moscow"));
     if (response.statusCode == 200) {
-      var document = parse(response.body); //в document
+      var document =
+          parse(response.body); //Каждая веб-страница, загруженная в браузер,
+      //имеет собственный объект Document , который обычно является HtmlDocument .
       setState(() {
         data = document
             .getElementsByClassName('temp__value temp__value_with-unit')[0]

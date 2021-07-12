@@ -62,7 +62,8 @@ class _JWTState extends State<JWT> {
       // Process the response.
       if (response.statusCode == 200) {
         response.listen((event) {
-          String responseString = String.fromCharCodes(event);
+          String responseString = String.fromCharCodes(
+              event); // //возвращает строку, созданную из указанной последовательности значений единиц кода UTF-16
           setState(() {
             token = json.decode(responseString)['token'];
             print(token);
@@ -71,7 +72,8 @@ class _JWTState extends State<JWT> {
       } else {
         response.listen((event) {
           setState(() {
-            responseText = String.fromCharCodes(event);
+            responseText = String.fromCharCodes(
+                event); // //возвращает строку, созданную из указанной последовательности значений единиц кода UTF-16
             responseImage = null;
             token = '';
           });
@@ -102,7 +104,8 @@ class _JWTState extends State<JWT> {
       } else {
         String gotResponse = '';
         response.forEach((element) {
-          gotResponse += String.fromCharCodes(element);
+          gotResponse += String.fromCharCodes(
+              element); ////возвращает строку, созданную из указанной последовательности значений единиц кода UTF-16
         }).then((value) {
           var jsonDecoded = json.decode(gotResponse);
           String message = jsonDecoded['message'];
@@ -139,9 +142,11 @@ class _JWTState extends State<JWT> {
               hintText: "Username",
             )),
         TextField(
+           obscureText: true,
             controller: passwordTextFieldController,
             decoration: InputDecoration(
               hintText: "Password",
+              
             )),
         ElevatedButton(onPressed: getToken, child: Text('Получить токен')),
         ElevatedButton(onPressed: getProtected, child: Text('Получить фото')),

@@ -47,7 +47,7 @@ class MyHomePage extends StatelessWidget {
         .setCurrentScreen(screenName: 'Page #$pageNum'); //текущий экран
     await MyApp.analytics.logEvent(
       name: 'page_change',
-      parameters: <String, dynamic>{'page': pageNum},
+      parameters: {'page': pageNum},
     );
   }
 
